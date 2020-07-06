@@ -24,26 +24,27 @@ function checkop(e,tp,eg,ep,ev,re,r,rp)
 		if ps&1<<p~=0 and lim[p]<lim[p+2] then
 			for i=0,6 do
 				local lc=1<<i
-				if #eg>0 and Duel.GetCurrentChain()>0 then lc=16 end
-				if lc==1 then
+				local tlc=lc
+				if #eg>lim[p] and Duel.GetCurrentChain()>0 then tlc=16 end
+				if tlc==1 then
 					Duel.Hint(HINT_SELECTMSG,p,HINTMSG_TODECK)
 					local g=eg:FilterSelect(p,sumexcess,-lim[p]+lim[p+2],-lim[p]+lim[p+2],nil,p,lc)
 					Duel.NegateSummon(g)
 					Duel.DisableShuffleCheck()
 					for nc in aux.Next(g) do Duel.SendtoDeck(nc,p,nc:GetPreviousSequence(),REASON_RULE+REASON_RETURN) lim[p]=lim[p]+1 end
-				elseif lc==2 then
+				elseif tlc==2 then
 					Duel.Hint(HINT_SELECTMSG,p,HINTMSG_RTOHAND)
 					local g=eg:FilterSelect(p,sumexcess,-lim[p]+lim[p+2],-lim[p]+lim[p+2],nil,p,lc)
 					Duel.NegateSummon(g)
 					for nc in aux.Next(g) do Duel.SendtoHand(nc,p,REASON_RULE+REASON_RETURN) lim[p]=lim[p]+1 end
 					Duel.ShuffleHand(p)
-				elseif lc==16 then
+				elseif tlc==16 then
 					Duel.Hint(HINT_SELECTMSG,p,HINTMSG_TOGRAVE)
 					local g=eg:FilterSelect(p,sumexcess,-lim[p]+lim[p+2],-lim[p]+lim[p+2],nil,p,lc)
 					Duel.NegateSummon(g)
 					Duel.SendtoGrave(g,REASON_RULE+REASON_RETURN)
 					lim[p]=lim[p]+#g
-				elseif lc==32 then
+				elseif tlc==32 then
 					Duel.Hint(HINT_SELECTMSG,p,HINTMSG_REMOVE)
 					local g=eg:FilterSelect(p,sumexcess,-lim[p]+lim[p+2],-lim[p]+lim[p+2],nil,p,lc)
 					Duel.NegateSummon(g)
@@ -89,15 +90,16 @@ if not global_check then
 	ge2:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
 	ge2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	ge2:SetCode(EVENT_SPSUMMON_SUCCESS)
+	ge2:SetProperty(EFFECT_FLAG_DELAY)
 	ge2:SetOperation(checkop)
 	Duel.RegisterEffect(ge2,0)
     local e4=ge2:Clone()
     e4:SetCode(EVENT_SUMMON_SUCCESS)
 	Duel.RegisterEffect(e4,0)
-	local ge3=e4:Clone()
-	ge3:SetCode(EVENT_SPSUMMON_NEGATED)
-	Duel.RegisterEffect(ge3,0)
-	local ge4=e4:Clone()
-	ge4:SetCode(EVENT_SUMMON_NEGATED)
-	Duel.RegisterEffect(ge4,0)
+	-- local ge3=e4:Clone()
+	-- ge3:SetCode(EVENT_SPSUMMON_NEGATED)
+	-- Duel.RegisterEffect(ge3,0)
+	-- local ge4=e4:Clone()
+	-- ge4:SetCode(EVENT_SUMMON_NEGATED)
+	-- Duel.RegisterEffect(ge4,0)
 end
